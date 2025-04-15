@@ -311,6 +311,9 @@ class KotInterpreter {
         } else if (expression.contains("/")) {
             String[] parts = expression.split("/");
             return evaluateArithmeticExpression(parts[0].trim()) / evaluateArithmeticExpression(parts[1].trim());
+        } else if (expression.contains("^")) {
+            String[] parts = expression.split("\\^");
+            return Math.pow(evaluateArithmeticExpression(parts[0].trim()), evaluateArithmeticExpression(parts[1].trim()));
         } else {
             // If it's just a number, return it
             return Double.parseDouble(expression.trim());
