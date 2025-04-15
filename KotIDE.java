@@ -216,7 +216,7 @@ class KotInterpreter {
             varMatcher.appendTail(exprWithValues);
 
             String evaluatedExpression = exprWithValues.toString();
-            return evaluateArithmeticExpression(evaluatedExpression);
+            return String.valueOf(evaluateArithmeticExpression(evaluatedExpression));
 
         } catch (Exception e) {
             return "Error evaluating expression";
@@ -290,16 +290,30 @@ class KotInterpreter {
         }
     }
 
-    private String evaluateArithmeticExpression(String expression) {
-        try {
+    private double evaluateArithmeticExpression(String expression) {
+        // Replace variables with their values
+        for (Map.Entry<String, Object> entry : variables.entrySet()) {
+            String varName = entry.getKey();
+            Object value = entry.getValue();
+            expression = expression.replace(varName, value.toString());
+        }
 
-            javax.script.ScriptEngineManager manager = new javax.script.ScriptEngineManager();
-            javax.script.ScriptEngine engine = manager.getEngineByName("JavaScript");
-
-            Object result = engine.eval(expression);
-            return result.toString();
-        } catch (Exception e) {
-            return "Error in arithmetic expression";
+        // Handle arithmetic operations (+, -, *, /)
+        if (expression.contains("+")) {
+            String[] parts = expression.split("\\+");
+            return evaluateArithmeticExpression(parts[0].trim()) + evaluateArithmeticExpression(parts[1].trim());
+        } else if (expression.contains("-")) {
+            String[] parts = expression.split("-");
+            return evaluateArithmeticExpression(parts[0].trim()) - evaluateArithmeticExpression(parts[1].trim());
+        } else if (expression.contains("*")) {
+            String[] parts = expression.split("\\*");
+            return evaluateArithmeticExpression(parts[0].trim()) * evaluateArithmeticExpression(parts[1].trim());
+        } else if (expression.contains("/")) {
+            String[] parts = expression.split("/");
+            return evaluateArithmeticExpression(parts[0].trim()) / evaluateArithmeticExpression(parts[1].trim());
+        } else {
+            // If it's just a number, return it
+            return Double.parseDouble(expression.trim());
         }
     }
 
